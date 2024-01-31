@@ -3,8 +3,8 @@ import time
 import csv
 import pandas as pd
 
-tiedosto = "arvot2.csv"
-excel = "arvot2.xlsx"
+tiedosto = "arvot.csv"
+excel = "arvot.xlsx"
 
 # Sarjaportin tiedot
 sarjaportin_nimi = 'COM5'
@@ -18,28 +18,27 @@ def lue_sarjaportti():
         while True:
             data = sarjaportti.readline().decode('utf-8').strip()
             if data:
-                vie_csv(data)
-                vie_exceliin(data)
+                lampotila, kosteus = erottele(data)
+                vie_csv(lampotila, kosteus)
+                vie_exceliin(lampotila, kosteus)
     finally:
         sarjaportti.close()
         print("Sarjaportti vapautettu.")
 
-def vie_csv(data):
+def vie_csv(lampotila, kosteus):
     try:
         with open(tiedosto, mode='a', newline='') as csv_tiedosto:
             csv_writer = csv.writer(csv_tiedosto)
             aika = time.strftime('%Y-%m-%d %H:%M:%S')
-            lampotila, kosteus = erottele(data)
             rivi = [aika, lampotila, kosteus]
             csv_writer.writerow(rivi)
 
     except Exception as e:
         print(f"Virhe tallennettaessa tiedostoon: {e}")
 
-def vie_exceliin(data):
+def vie_exceliin(lampotila, kosteus):
     try:
         aika = time.strftime('%Y-%m-%d %H:%M:%S')
-        lampotila, kosteus = erottele(data)
         try:
             df = pd.read_excel(excel)
         except FileNotFoundError:
@@ -55,13 +54,9 @@ def erottele(data):
     osat = data.split("-")
     lampotila = osat[0]
     kosteus = osat[1]
-    
     lampotila_arvo = float(lampotila)
     kosteus_arvo = float(kosteus)
-    
     print(str(lampotila_arvo) +" C" + " - " + str(kosteus_arvo) + " %")
-    
-    
     return lampotila_arvo, kosteus_arvo
 
 if __name__ == "__main__":
