@@ -3,14 +3,12 @@ import time
 import csv
 import pandas as pd
 
-tiedosto = "arvot.csv"
-excel = "arvot.xlsx"
+csv_tiedosto = "arvot.csv"
+excel_tiedosto = "arvot.xlsx"
 
-# Sarjaportin tiedot
 sarjaportin_nimi = 'COM5'
 sarjaportin_nopeus = 9600
 
-# Sarjaportin alustus
 sarjaportti = serial.Serial(sarjaportin_nimi, sarjaportin_nopeus, timeout=1)
 
 def lue_sarjaportti():
@@ -19,34 +17,34 @@ def lue_sarjaportti():
             data = sarjaportti.readline().decode('utf-8').strip()
             if data:
                 lampotila, kosteus = erottele(data)
-                vie_csv(lampotila, kosteus)
-                vie_exceliin(lampotila, kosteus)
+                vie_csv(lampotila, kosteus, csv_tiedosto)
+                vie_exceliin(lampotila, kosteus, excel_tiedosto)
     finally:
         sarjaportti.close()
         print("Sarjaportti vapautettu.")
 
-def vie_csv(lampotila, kosteus):
+def vie_csv(lampotila, kosteus, csv_tiedosto):
     try:
-        with open(tiedosto, mode='a', newline='') as csv_tiedosto:
-            csv_writer = csv.writer(csv_tiedosto)
+        with open(csv_tiedosto, mode='w', newline='') as tiedosto:
+            csv_kirjoittaja = csv.writer(tiedosto)
             aika = time.strftime('%Y-%m-%d %H:%M:%S')
             rivi = [aika, lampotila, kosteus]
-            csv_writer.writerow(rivi)
+            csv_kirjoittaja.writerow(rivi)
 
     except Exception as e:
         print(f"Virhe tallennettaessa tiedostoon: {e}")
 
-def vie_exceliin(lampotila, kosteus):
+def vie_exceliin(lampotila, kosteus, excel_tiedosto):
     try:
         aika = time.strftime('%Y-%m-%d %H:%M:%S')
         try:
-            df = pd.read_excel(excel)
+            df = pd.read_excel(excel_tiedosto)
         except FileNotFoundError:
             df = pd.DataFrame(columns=["Aika", "Lämpötila", "Kosteus"])
 
         uusi_rivi = pd.DataFrame([[aika, lampotila, kosteus]], columns=['Aika', 'Lämpötila', 'Kosteus'])
         df = pd.concat([df, uusi_rivi], ignore_index=True)
-        df.to_excel(excel, index=False)
+        df.to_excel(excel_tiedosto, index=False)
     except Exception as e:
         print(f"Virhe tallennettaessa Excel-tiedostoon: {e}")
 
