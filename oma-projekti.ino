@@ -9,8 +9,6 @@ DHT22 dht22(6);
 // Muuttujat lämpötilalle ja kosteudelle (liukuluku tarkan arvon mittaamiseksi)
 float temp;
 float hum;
-// Kaksialkioinen taulukkomuuttuja lämpötilalle ja kosteudelle
-float mitatutArvot[2];
 
 // Alustusfunktiossa avataan portti, alustetaan lcd ja tulostetaan tervehdys
 void setup() {
@@ -23,52 +21,34 @@ void setup() {
 // Toistetaan loputtomasti
 void loop() {
   lcd.clear();
-  lampotila();
+  temp = lampotila();
   lcd.setCursor(0, 1);
-  kosteus();
-  tulostaTaulukko();
+  hum = kosteus();
+  tulosta(temp, hum);
   delay(5000);
 }
 
 // Lukee anturilta lämpötilan
-void lampotila() {
+float lampotila() {
   temp = dht22.getTemperature();
-  tallennaTaulukkoon(temp, 'C');
   lcd.print("Lampot.: ");
   lcd.print(temp, 1); 
   lcd.print(" C");
+  return temp;
 }
 
 // Lukee anturilta kosteuden
-void kosteus() {
+float kosteus() {
   hum = dht22.getHumidity();
-  tallennaTaulukkoon(hum, '%');
   lcd.print("Kosteus: ");
   lcd.print(hum, 0); 
   lcd.print(" %");
+  return hum;
 }
 
-// Funktio mitattujen arvojen taulukkomuuttujaan tallentamiseksi
-void tallennaTaulukkoon(float arvo, char yksikko) {
-  switch (yksikko) {
-    case 'C':
-      mitatutArvot[0] = arvo;
-      break;
-
-    case '%':
-      mitatutArvot[1] = arvo;
-      break;
-  }
-}
-
-// Funktio uusimman alkion tulostamiseen terminaaliin jos sarjaportti auki
-void tulostaTaulukko() {
-  if (Serial) {
-    Serial.print(mitatutArvot[0]);
-    Serial.print(" C, Kosteus: ");
-    Serial.print(mitatutArvot[1]);
-    Serial.println(" %");
-  } 
+void tulosta (float temp, float hum) {
+  Serial.println(temp);
+  Serial.println(hum);
 }
 
 void tervehdys() {
