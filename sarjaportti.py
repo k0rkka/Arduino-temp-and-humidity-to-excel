@@ -3,8 +3,8 @@ import time
 import csv
 import pandas as pd
 
-tiedosto = "arvot.csv"
-excel = "arvot.xlsx"
+tiedosto = "arvot2.csv"
+excel = "arvot2.xlsx"
 
 # Sarjaportin tiedot
 sarjaportin_nimi = 'COM5'
@@ -18,9 +18,8 @@ def lue_sarjaportti():
         while True:
             data = sarjaportti.readline().decode('utf-8').strip()
             if data:
-                #vie_csv(data)
-                #vie_exceliin(data)
-                print(data)
+                vie_csv(data)
+                vie_exceliin(data)
     finally:
         sarjaportti.close()
         print("Sarjaportti vapautettu.")
@@ -53,16 +52,15 @@ def vie_exceliin(data):
         print(f"Virhe tallennettaessa Excel-tiedostoon: {e}")
 
 def erottele(data):
-    osat = data.split(", ")
+    osat = data.split("-")
     lampotila = osat[0]
     kosteus = osat[1]
     
-    lampotila_osa = lampotila.split(" ")
-    lampotila_arvo = float(lampotila_osa[1])
+    lampotila_arvo = float(lampotila)
+    kosteus_arvo = float(kosteus)
     
+    print(str(lampotila_arvo) +" C" + " - " + str(kosteus_arvo) + " %")
     
-    kosteus_osa = kosteus.split(" ")
-    kosteus_arvo = float(kosteus_osa[1])
     
     return lampotila_arvo, kosteus_arvo
 
