@@ -47,7 +47,8 @@ float kosteus() {
 }
 
 void tulosta (float temp, float hum) {
-  Serial.println(temp);
+  Serial.print(temp);
+  Serial.print("-");
   Serial.println(hum);
 }
 
